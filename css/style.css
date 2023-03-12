@@ -1,6 +1,5 @@
 body{
     font-family: 'Helvetica';
-    /* Sans-Serif'; */
     padding:1rem;
 }
 
@@ -17,4 +16,28 @@ a {
 .comment__respond{
     text-align: center;
     display: block;
+}
+
+.comments__paggination{
+    text-align: center;
+}
+
+.comments__btn{
+    padding:.5rem;
+    cursor: pointer;
+}
+
+.comments__page{
+    background-color: rgba(3, 3, 204, 0.759);
+    border-radius: 1rem;
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    color:white;
+    display: inline-block;
+}
+
+.disabled{
+    pointer-events: none;
+    color: rgb(220, 220, 220);
 }

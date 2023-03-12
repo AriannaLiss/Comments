@@ -10,6 +10,11 @@
     "body":
 */
 
+const commentsObj = {
+    page: 1,
+    comments: []
+};
+
 function get(url, callback){
     const ajax = new XMLHttpRequest();
     ajax.open('get', url);
@@ -35,40 +40,92 @@ function get(url, callback){
   }
   */
 
-function getComments(comments){
+function getComments(comments = commentsObj.comments){
+    commentsObj.comments = comments;
     const container = document.querySelector('.comments');
-    // let i=0
-    //comments = Array.from(comments);
-    console.log('received ' + comments.length + ' comments.');
-    console.log(comments);
-    for (let i=0;i<10;i++){
-        console.log(comments[i]);
+    cleanComments();
+    const paggination = document.querySelector('.comments__paggination');
+    const shift = 10*(commentsObj.page - 1);
+    for (let i = 0 + shift; i < 10 + shift; i++){
         const div = createTag('div','comment');
-        const name = comments[i].name.charAt(0).toUpperCase() + comments[i].name.slice(1);
-        div.appendChild(createTag('h3','comment__name',name));
-        div.appendChild(createTag('p','comment__text',comments[i].body));
-        const a = createTag('a','comment__respond','Respond');
-        a.href = "#";
-        div.appendChild(a);
-        container.appendChild(div);
+        div.appendChild(getName(comments[i]));
+        div.appendChild(getBody(comments[i]));
+        div.appendChild(getRespondLink(comments[i]));
+        container.insertBefore(div, paggination);
     }
-    // Array.from(comments).forEach((comment,i) => {
-    //     if (i>=10) return false;
-    //     console.log(comment);
-    //     const div = createTag('div','comment');
-    //     const h2 = createTag('h2','comment__name',comment.name);
-    // })
+}
+
+function getName(comment){
+    const name = comment.id + ' ' + comment.name.charAt(0).toUpperCase() + comment.name.slice(1);
+    return createTag('h3','comment__name',name);
+}
+
+function getBody(comment){
+    return createTag('p','comment__text',comment.body);
+}
+
+function getRespondLink(comment){        
+    const a = createTag('a','comment__respond','Respond');
+    a.href = 'mailto:' + comment.email;
+    return a;
+}
+
+function cleanComments(){
+    console.log('cleanComments');
+    const container = document.querySelector('.comments');
+    Array.from(document.getElementsByClassName('comment')).forEach((comment) => {
+        container.removeChild(comment);
+    });
 }
 
 function createTag(tagName, className, text){
     const tag = document.createElement(tagName);
     if (className) tag.classList.add(className);
-    if (text) tag.innerText = text;
+    if (text) tag.innerHTML = text;
     return tag;
+}
+
+function paggination(){
+    const paggination = createTag('div','comments__paggination')
+    const prev = createTag('span','comments__btn','&#8678');
+    const next = createTag('span','comments__btn','&#8680;');
+    prev.id = "prevBtn";
+    next.id = "nextBtn";
+    prev.classList.add('disabled');
+    prev.addEventListener('click', prevPage);
+    next.addEventListener('click', nextPage);
+    const page = createTag('span','comments__page','1');
+    paggination.appendChild(prev);
+    paggination.appendChild(page);
+    paggination.appendChild(next);
+    return paggination;
+}
+
+function nextPage(e){
+    if (e.target.classList.contains('disabled')) return;
+    commentsObj.page ++;
+    document.querySelector('.comments__page').innerHTML = commentsObj.page;
+    if (commentsObj.page >= commentsObj.comments.length/10.){
+        e.target.classList.add('disabled');
+    }
+    document.querySelector('#prevBtn').classList.remove('disabled');
+    getComments();
+}
+
+function prevPage(e){
+    if (e.target.classList.contains('disabled')) return;
+    commentsObj.page --;
+    document.querySelector('.comments__page').innerHTML = commentsObj.page;
+    if (commentsObj.page === 1){
+        e.target.classList.add('disabled');
+    }
+    document.querySelector('#nextBtn').classList.remove('disabled');
+    getComments();
 }
 
 const comments = createTag('div','comments');
 comments.appendChild(createTag('h1','comments__title','Comments'));
+comments.appendChild(paggination());
 document.querySelector('body').appendChild(comments);
 
 get('https://jsonplaceholder.typicode.com/comments', getComments);    
