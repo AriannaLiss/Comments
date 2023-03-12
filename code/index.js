@@ -23,6 +23,7 @@ function get(url, callback){
         if (ajax.readyState === 4) {
             if (ajax.status >= 200 && ajax.status < 300) {
                 callback(JSON.parse(ajax.response));
+                document.querySelector('.loader').classList.add('hide');
             } else {
                 console.error(ajax.status + "/" + ajax.statusText);
             }
@@ -71,7 +72,6 @@ function getRespondLink(comment){
 }
 
 function cleanComments(){
-    console.log('cleanComments');
     const container = document.querySelector('.comments');
     Array.from(document.getElementsByClassName('comment')).forEach((comment) => {
         container.removeChild(comment);
